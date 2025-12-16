@@ -21,6 +21,7 @@ public class CPU_scheduling {
 
 
             RoundRobin.roundRobin(processQueue, rrQuantum, contextSwitch);
+            ShortestJobFirst scheduler = new ShortestJobFirst(contextSwitch);
             
 //            AlgorithmResult myResult = new AlgorithmResult();
 //            ExpectedOutput expectedOutput = new ExpectedOutput();
