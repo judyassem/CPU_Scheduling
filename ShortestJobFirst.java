@@ -3,6 +3,9 @@ public class ShortestJobFirst {
     ArrayList<Process> processes = new ArrayList<>();
     int contextSwitch;
 
+    // ✅ moved here (class level)
+    private AlgorithmResult sjf;
+
     public ShortestJobFirst(int contextSwitch) {
         this.contextSwitch = contextSwitch;
     }
@@ -51,18 +54,19 @@ public class ShortestJobFirst {
                 }
 
             } else {
-                time++; 
+                time++;
             }
         }
 
-        
         System.out.println("Execution Order:");
         for (int pid : executionOrder) {
             System.out.print("P" + pid + " ");
         }
+
         System.out.println("\n\nPID\tBT\tAT\tWT\tTAT");
         for (Process p : processes) {
-            System.out.println("P" + p.processId + "\t" + p.burstTime+"\t"+ p.arrivalTime+"\t" + p.waitingTime + "\t" + p.turnaroundTime);
+            System.out.println("P" + p.processId + "\t" + p.burstTime + "\t"
+                    + p.arrivalTime + "\t" + p.waitingTime + "\t" + p.turnaroundTime);
         }
 
         double totalWT = 0, totalTAT = 0;
@@ -70,7 +74,8 @@ public class ShortestJobFirst {
             totalWT += p.waitingTime;
             totalTAT += p.turnaroundTime;
         }
+
         System.out.println("\nAverage Waiting Time: " + (totalWT / n));
         System.out.println("Average Turnaround Time: " + (totalTAT / n));
-     private AlgorithmResult sjf;
+    }
 }
