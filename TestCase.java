@@ -1,34 +1,38 @@
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestCase {
+    @JsonProperty("name")
     private String name;
-    private Input input;
-    private ExpectedOutput expectedOutput;
 
-    // getters and setters
-    public Input getInput(){
-        return input;
-    }
+    @JsonProperty("input")
+    private Input input;
+
+    @JsonProperty("expectedOutput")
+    private ExpectedOutput expectedOutput;
 
     public String getName() {
         return name;
-    }
-    public ExpectedOutput getExpectedOutput() {
-        return expectedOutput;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public Input getInput() {
+        return input;
+    }
+
     public void setInput(Input input) {
         this.input = input;
     }
+
+    public ExpectedOutput getExpectedOutput() {
+        return expectedOutput;
+    }
+
     public void setExpectedOutput(ExpectedOutput expectedOutput) {
         this.expectedOutput = expectedOutput;
     }
-
 }
