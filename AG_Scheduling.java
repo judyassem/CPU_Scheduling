@@ -1,5 +1,4 @@
 import java.util.*;
-
 public class AG_Scheduling {
     private static void checkAndAddArrivals(int currentTime, ArrayList<Process> processes, boolean[] isCompleted, Queue<Process> readyQueue, Process currentProcess) {
         for (Process other : processes) {
@@ -13,15 +12,13 @@ public class AG_Scheduling {
         }
     }
     
-    // Change return type to List<String> to return execution order
-    static List<String> AgScheduling(ArrayList<Process> processes) {
+    static void AgScheduling(ArrayList<Process> processes) {
         int time = 0;
         int completed = 0;
         int n = processes.size();
     
         LinkedList<Process> readyQueue = new LinkedList<>();
         boolean[] isCompleted = new boolean[n];
-        List<String> executionOrder = new ArrayList<>();
         
         // Add initial process that arrives at time 0
         if (!processes.isEmpty() && processes.get(0).getArrival() == 0) {
@@ -43,13 +40,7 @@ public class AG_Scheduling {
             int q = p.getQuantum();
             int usedTime = 0;
             
-            // Add to execution order
-            executionOrder.add("P" + p.getName());
-            
-            // Track initial quantum if not already tracked
-            if (p.getQuantumHistory().isEmpty()) {
-                p.addToQuantumHistory(q);
-            }
+            System.out.println("\nTime " + time + " -> P" + p.getName() + " starts running (Q = " + q + ")");
             
             /* ================= PHASE 1 : FCFS (25%) ================= */
             int t1 = (int) Math.ceil(0.25 * q);
@@ -69,7 +60,6 @@ public class AG_Scheduling {
                 if (p.getRemainingBurst() == 0) {
                     isCompleted[idx] = true;
                     p.setQuantum(0);
-                    p.addToQuantumHistory(0); // Add 0 at completion
                     p.setCompletionTime(time);
                     p.setTurnaroundTime(time - p.getArrival());
                     p.setWaitingTime(p.getTurnaroundTime() - p.getBurst());
@@ -96,9 +86,7 @@ public class AG_Scheduling {
             
             if (highPriority != null) {
                 // Preempt with full remaining quantum
-                int newQuantum = p.getQuantum() + (q - usedTime);
-                p.setQuantum(newQuantum);
-                p.addToQuantumHistory(newQuantum);
+                p.setQuantum(p.getQuantum() + (q - usedTime));
                 readyQueue.add(p);
                 
                 // Move higher priority process to front
@@ -106,6 +94,7 @@ public class AG_Scheduling {
                     readyQueue.remove(highPriority);
                 }
                 readyQueue.addFirst(highPriority);
+            
                 continue;
             }
             
@@ -125,7 +114,6 @@ public class AG_Scheduling {
                 if (p.getRemainingBurst() == 0) {
                     isCompleted[idx] = true;
                     p.setQuantum(0);
-                    p.addToQuantumHistory(0);
                     p.setCompletionTime(time);
                     p.setTurnaroundTime(time - p.getArrival());
                     p.setWaitingTime(p.getTurnaroundTime() - p.getBurst());
@@ -139,9 +127,7 @@ public class AG_Scheduling {
             
             // Check if quantum exhausted after Phase 2
             if (usedTime >= q) {
-                int newQuantum = p.getQuantum() + 2;
-                p.setQuantum(newQuantum);
-                p.addToQuantumHistory(newQuantum);
+                p.setQuantum(p.getQuantum() + 2);
                 readyQueue.add(p);
                 continue;
             }
@@ -165,9 +151,7 @@ public class AG_Scheduling {
                 
                 if (shorterJob != null) {
                     // Preempt with full remaining quantum
-                    int newQuantum = p.getQuantum() + remaining;
-                    p.setQuantum(newQuantum);
-                    p.addToQuantumHistory(newQuantum);
+                    p.setQuantum(p.getQuantum() + remaining);
                     readyQueue.add(p);
                     
                     // Move shorter job to front
@@ -192,7 +176,6 @@ public class AG_Scheduling {
                 if (p.getRemainingBurst() == 0) {
                     isCompleted[idx] = true;
                     p.setQuantum(0);
-                    p.addToQuantumHistory(0);
                     p.setCompletionTime(time);
                     p.setTurnaroundTime(time - p.getArrival());
                     p.setWaitingTime(p.getTurnaroundTime() - p.getBurst());
@@ -208,7 +191,6 @@ public class AG_Scheduling {
             if (p.getRemainingBurst() == 0) {
                 isCompleted[idx] = true;
                 p.setQuantum(0);
-                p.addToQuantumHistory(0);
                 p.setCompletionTime(time);
                 p.setTurnaroundTime(time - p.getArrival());
                 p.setWaitingTime(p.getTurnaroundTime() - p.getBurst());
@@ -216,18 +198,39 @@ public class AG_Scheduling {
             }
             // Scenario (i): used full quantum
             else if (!preempted && usedTime >= q) {
-                int newQuantum = p.getQuantum() + 2;
-                p.setQuantum(newQuantum);
-                p.addToQuantumHistory(newQuantum);
+                p.setQuantum(p.getQuantum() + 2);
                 readyQueue.add(p);
             }
             // If preempted, quantum already updated above
-            else if (!preempted) {
-                // Process still has burst but quantum not exhausted
-                readyQueue.add(p);
-            }
         }
         
-        return executionOrder;
+        // Print results
+        System.out.println("\n=== Scheduling Results ===");
+        System.out.println("Process | Arrival | Burst | Priority | Quantum | CT | TAT | WT");
+        double totalTAT = 0;
+        double totalWT = 0;
+        for (Process p : processes) {
+            System.out.printf("P%-6s | %-7d | %-5d | %-8d | %-7d | %-2d | %-3d | %-2d\n",
+                p.getName(), p.getArrival(), p.getBurst(), p.getPriority(), p.getQuantum(),
+                p.getCompletionTime(), p.getTurnaroundTime(), p.getWaitingTime());
+            totalTAT += p.getTurnaroundTime();
+            totalWT += p.getWaitingTime();
+        }
+        
+        System.out.printf("\nAverage Turnaround Time: %.2f\n", totalTAT / n);
+        System.out.printf("Average Waiting Time: %.2f\n", totalWT / n);
+    }
+    
+    public static void main(String[] args) {
+        ArrayList<Process> processes = new ArrayList<>();
+        
+        // Example Processes (using name as String)
+        processes.add(new Process("1", 0, 17, 4, 7));
+        processes.add(new Process("2", 2, 6, 7, 9));
+        processes.add(new Process("3", 5, 11, 3, 4));
+        processes.add(new Process("4", 15, 4, 6, 6));
+        
+        System.out.println("=== AG Scheduling Algorithm ===");
+        AgScheduling(processes);
     }
 }
