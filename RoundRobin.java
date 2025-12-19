@@ -80,8 +80,8 @@ public class RoundRobin {
         }
 
         myResult.setProcessResults(myProcessesResult);
-        myResult.setAverageWaitingTime(totalWT / completionTime.size());
-        myResult.setAverageTurnaroundTime(totalTAT / completionTime.size());
+        myResult.setAverageWaitingTime(round2(totalWT / completionTime.size()));
+        myResult.setAverageTurnaroundTime(round2(totalTAT / completionTime.size()));
         LinkedList<String> order = new LinkedList<String>();
         for (Process process : CPU) {
             order.add(process.getName());
@@ -89,4 +89,9 @@ public class RoundRobin {
         myResult.setExecutionOrder(order);
     return myResult;
     }
+
+    private static double round2(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
 }
